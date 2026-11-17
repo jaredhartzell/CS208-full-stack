@@ -1,23 +1,63 @@
+
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  ol
-  each val in todos
-    li
-      span= val.task + ' - '
-      if val.completed > 0
-        span Completed
-      else
-        span Not Completed
-      form(method='POST' action='/delete')
-        input(type='hidden', name='id', value=val.id)
-        button(type='submit') Delete
+  .container
+    header.page-header
+      h1= title
+      p.subtitle Manage your tasks and track your progress.
 
-  hr
-  h2 Add a new task
-  form(method='POST' action='/create')
-    label(for='task') Task:
-    input(type='text', name='task', id='task', required)
-    button(type='submit') Create Task
+    .section-header
+      h2 My Tasks
+      span.task-count #{todos.length} #{todos.length === 1 ? 'task' : 'tasks'}
+
+    if todos.length === 0
+      .empty-message
+        p No tasks yet. Add one below!
+    else
+      ol.task-list
+        each val in todos
+          li.task-item(class=val.completed > 0 ? 'completed' : '')
+            form.task-form(method='POST', action='/update')
+              input(type='hidden', name='id', value=val.id)
+
+              .task-edit-row
+                input.task-input(
+                  type='text',
+                  name='task',
+                  value=val.task,
+                  placeholder='Task description',
+                  required
+                )
+
+                button.save-btn(type='submit') Save
+
+              .task-status
+                label.status-label
+                  input(
+                    type='checkbox',
+                    name='completed',
+                    value='1',
+                    checked=val.completed > 0
+                  )
+                  span Completed
+
+            form.delete-form(method='POST', action='/delete')
+              input(type='hidden', name='id', value=val.id)
+              button.delete-btn(type='submit') Delete
+
+    hr
+
+    section.add-section
+      h2 Add a New Task
+
+      form.add-form(method='POST', action='/create')
+        input(
+          type='text',
+          name='task',
+          id='task',
+          placeholder='What needs to be done?',
+          required
+        )
+
+        button.create-btn(type='submit') Add Task
